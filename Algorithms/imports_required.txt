@@ -1,0 +1,6 @@
+conda install numpy
+pip install pydataset
+conda install pandas
+conda install matplotlib
+conda install seaborn
+conda install scipy

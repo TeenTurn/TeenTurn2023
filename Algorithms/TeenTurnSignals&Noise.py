@@ -1,8 +1,9 @@
-#%% IMPORTS
+# IMPORTS
 from pydataset import data
 import numpy as np
 import matplotlib.pyplot as plt
-#%% SIGNALS AND NOISE
+
+# SIGNALS AND NOISE
 
 f = 10      # signal frequency
 fs = 1000   # sampling frequency

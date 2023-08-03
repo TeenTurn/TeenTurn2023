@@ -1,4 +1,4 @@
-#%% IMPORTING PACKAGES THAT WE WILL USE LATER ON
+# IMPORTING PACKAGES THAT WE WILL USE LATER ON
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ from scipy.fft import fft, fftfreq
 import sounddevice as sd
 from secret_chords import get_signal
 
-#%% DEFINING SIGNALS THAT WILL COMBINE TO MAKE ONE SIGNAL WHICH WILL BE PLOTTED AND PLAYED
+# DEFINING SIGNALS THAT WILL COMBINE TO MAKE ONE SIGNAL WHICH WILL BE PLOTTED AND PLAYED
 
 # Load the secret signals from a secret folder
 signal1 = get_signal(1)
@@ -15,7 +15,7 @@ signal3 = get_signal(3)
 signals = signal1 + signal2 + signal3
 
 # Defining the number of times per second that a sample from our signal will be taken
-fs = 1000  # sampling frequency
+fs = 10000  # sampling frequency
 
 # Defining how long our signal will last (in seconds)
 signal_duration = 1
@@ -26,7 +26,7 @@ step_size1 = 0.0001  # 0.1ms
 # In order to plot the signal we need to define an array for time
 t1 = np.arange(0, signal_duration, step_size1)
 
-#%% PLAY THE SIGNALS INDIVIDUALLY
+# PLAY THE SIGNALS INDIVIDUALLY
 # Increasing the sampling frequency to help the recording sound better
 fs_high = 48000
 
@@ -46,7 +46,7 @@ print("Playing the chord")
 sd.play(signals, fs_high)
 sd.wait()
 
-#%% CALCULATING THE SPECTRUM FOR EACH SIGNAL
+# CALCULATING THE SPECTRUM FOR EACH SIGNAL
 
 # Explanation
 # In order for us to see which notes are playing on the piano, we need to see which frequencies are dominating the signal. 
@@ -66,16 +66,17 @@ frequencies3 = fftfreq(N, 1/fs)[:N//2]
 spectrum_all = fft(signals)[:N//2]
 frequencies_all = fftfreq(N, 1/fs)[:N//2]
 
-#%% PLOTTING THE SIGNALS AND THEIR SPECTRA (NOTHING OF MUCH INTEREST TO SEE HERE ;) )
+# PLOTTING THE SIGNALS AND THEIR SPECTRA 
 
 # Create a figure
-plt.figure(figsize=(20, 20))
+plt.figure(figsize=(10, 10))
 
 # Add many plots to the figure so we can show multiple things on the same page
 plt.subplot(4, 2, 1)
 plt.plot(t1, signal1)
 plt.ylabel("Signal Amplitude")
 plt.xlabel("Time (s)")
+plt.title("Note 1")
 plt.xlim([0, t1[-1]])
 plt.ylim([np.min(signal1), np.max(signal1)])
 
@@ -83,11 +84,13 @@ plt.subplot(4, 2, 2)
 plt.plot(frequencies1, np.abs(spectrum1))
 plt.xlim([0, frequencies1[-1]])
 plt.ylim([0, np.max(frequencies_all)])
+plt.title("Spectrum of Note 1")
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Amplitude')
 
 plt.subplot(4, 2, 3)
 plt.plot(t1, signal2)
+plt.title("Note 2")
 plt.ylabel("Signal Amplitude")
 plt.xlabel("Time (s)")
 plt.xlim([0, t1[-1]])
@@ -97,11 +100,13 @@ plt.subplot(4, 2, 4)
 plt.plot(frequencies2, np.abs(spectrum2))
 plt.xlim([0, frequencies2[-1]])
 plt.ylim([0, np.max(frequencies2)])
+plt.title("Spectrum of Note 2")
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Amplitude')
 
 plt.subplot(4, 2, 5)
 plt.plot(t1, signal3)
+plt.title("Note 3")
 plt.ylabel("Signal Amplitude")
 plt.xlabel("Time (s)")
 plt.xlim([0, t1[-1]])
@@ -111,11 +116,13 @@ plt.subplot(4, 2, 6)
 plt.plot(frequencies3, np.abs(spectrum3))
 plt.xlim([0, frequencies3[-1]])
 plt.ylim([0, np.max(frequencies_all)])
+plt.title("Spectrum of Note 3")
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Amplitude')
 
 plt.subplot(4, 2, 7)
 plt.plot(t1, signals)
+plt.title("Chord")
 plt.ylabel("Signal Amplitude")
 plt.xlabel("Time (s)")
 plt.xlim([0, t1[-1]])
@@ -125,10 +132,10 @@ plt.subplot(4, 2, 8)
 plt.plot(frequencies_all, np.abs(spectrum_all))
 plt.xlim([0, frequencies_all[-1]])
 plt.ylim([0, np.max(frequencies_all)])
+plt.title("Spectrum of Chord")
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Amplitude')
-plt.margins(0.0)
-
+plt.tight_layout()
 
 # After all this figure "creating", show the figure (this will pop up on your screen once this is run)
 plt.show()

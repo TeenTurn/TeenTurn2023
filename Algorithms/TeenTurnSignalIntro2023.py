@@ -1,4 +1,4 @@
-#%% IMPORTS
+# IMPORTS
 from pydataset import data
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ import seaborn as sns
 from scipy import signal
 from scipy.fft import fftshift
 
-#%% DEFINING A SINE WAVE SIGNAL
+# DEFINING A SINE WAVE SIGNAL
 f = 100     # Hz, signal frequency
 fs = 1000   # Hz, sampling frequency
 signal_duration = 0.2 # in seconds

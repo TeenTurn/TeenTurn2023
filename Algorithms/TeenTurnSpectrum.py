@@ -1,141 +1,70 @@
 # IMPORTING PACKAGES THAT WE WILL USE LATER ON
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
-import sounddevice as sd
-from secret_chords import get_signal
 
-# DEFINING SIGNALS THAT WILL COMBINE TO MAKE ONE SIGNAL WHICH WILL BE PLOTTED AND PLAYED
+# CREATING A SINE WAVE
+# A sine wave has the following equation: np.sin(2*np.pi*frequency*time)
+# frequency = how often the signal repeats
+# time = duration of the signal
 
-# Load the secret signals from a secret folder
-signal1 = get_signal(1)
-signal2 = get_signal(2)
-signal3 = get_signal(3)
-signals = signal1 + signal2 + signal3
+# define a frequency for the signal
+frequency = 5 # Hz 
 
-# Defining the number of times per second that a sample from our signal will be taken
-fs = 10000  # sampling frequency
+# define a time duration for the signal
+duration = 2 # seconds
 
-# Defining how long our signal will last (in seconds)
-signal_duration = 1
-
-# Defining how many samples the signal will last for
-step_size1 = 0.0001  # 0.1ms
+# in order to plot the sine signal against time we have to create an array for the time
+# defining how often a sample is taken from the signal - step_size
+step_size1 = 0.001
+sampling_frequency = 1/step_size1 # 1,000 Hz
 
 # In order to plot the signal we need to define an array for time
-t1 = np.arange(0, signal_duration, step_size1)
+time_array = np.arange(0, duration, step_size1)
 
-# PLAY THE SIGNALS INDIVIDUALLY
-# Increasing the sampling frequency to help the recording sound better
-fs_high = 48000
+# Now we can calculate our sine signal
+sine_signal1 = np.sin(2*np.pi*frequency*time_array)
 
-print("Playing the first note")
-sd.play(signal1, fs_high)
-sd.wait()
+# ADD A SECOND SINE WAVE TO YOUR ORIGINAL SIGNALS
+# Now we can add another sine wave (with a different frequency) to our original sine wave signal
+frequency2 = 10 # Hz
 
-print("Playing the second note")
-sd.play(signal2, fs_high)
-sd.wait()
+sine_signal2 = np.sin(2*np.pi*frequency2*time_array)
 
-print("Playing the third note")
-sd.play(signal3, fs_high)
-sd.wait()
+sine_signal = sine_signal1 + sine_signal2
 
-print("Playing the chord")
-sd.play(signals, fs_high)
-sd.wait()
 
-# CALCULATING THE SPECTRUM FOR EACH SIGNAL
+# CALCULATING THE SPECTRUM FOR OUR COMBINED SIGNAL
 
 # Explanation
 # In order for us to see which notes are playing on the piano, we need to see which frequencies are dominating the signal. 
 # When we calculate the spectrum of each signal we show which frequencies (or sine waves with certain frequencies) work 
 # together to create the chord.
 
-N = len(signal1)
-spectrum1 = fft(signal1)[:N//2]
-frequencies1 = fftfreq(N, 1/fs)[:N//2]
+N = len(sine_signal)
+spectrum = np.abs(fft(sine_signal)[:N//2])
+frequencies = fftfreq(N, 1/sampling_frequency)[:N//2]
 
-spectrum2 = fft(signal2)[:N//2]
-frequencies2 = fftfreq(N, 1/fs)[:N//2]
 
-spectrum3 = fft(signal3)[:N//2]
-frequencies3 = fftfreq(N, 1/fs)[:N//2]
 
-spectrum_all = fft(signals)[:N//2]
-frequencies_all = fftfreq(N, 1/fs)[:N//2]
-
-# PLOTTING THE SIGNALS AND THEIR SPECTRA 
-
-# Create a figure
-plt.figure(figsize=(10, 10))
-
-# Add many plots to the figure so we can show multiple things on the same page
-plt.subplot(4, 2, 1)
-plt.plot(t1, signal1)
+# Now we can plot our sine signal
+plt.figure()
+plt.subplot(2, 1, 1)
+plt.plot(time_array, sine_signal)
+plt.plot(time_array, sine_signal1, "r--")
+plt.plot(time_array, sine_signal2, "g--")
+plt.xlim([0, time_array[-1]])
+plt.legend(["Combined signal", "Signal 1", "Signal 2"])
+plt.xlabel("Time (seconds)")
 plt.ylabel("Signal Amplitude")
-plt.xlabel("Time (s)")
-plt.title("Note 1")
-plt.xlim([0, t1[-1]])
-plt.ylim([np.min(signal1), np.max(signal1)])
+plt.title("Sine wave with a frequency of "+str(frequency)+" Hz")
 
-plt.subplot(4, 2, 2)
-plt.plot(frequencies1, np.abs(spectrum1))
-plt.xlim([0, frequencies1[-1]])
-plt.ylim([0, np.max(frequencies_all)])
-plt.title("Spectrum of Note 1")
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Amplitude')
-
-plt.subplot(4, 2, 3)
-plt.plot(t1, signal2)
-plt.title("Note 2")
-plt.ylabel("Signal Amplitude")
-plt.xlabel("Time (s)")
-plt.xlim([0, t1[-1]])
-plt.ylim([np.min(signal2), np.max(signal2)])
-
-plt.subplot(4, 2, 4)
-plt.plot(frequencies2, np.abs(spectrum2))
-plt.xlim([0, frequencies2[-1]])
-plt.ylim([0, np.max(frequencies2)])
+plt.subplot(2, 1, 2)
+plt.plot(frequencies, np.abs(spectrum))
+plt.xlim([0, frequencies[-1]])
+plt.ylim([0, np.max(spectrum)+100])
 plt.title("Spectrum of Note 2")
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Amplitude')
-
-plt.subplot(4, 2, 5)
-plt.plot(t1, signal3)
-plt.title("Note 3")
-plt.ylabel("Signal Amplitude")
-plt.xlabel("Time (s)")
-plt.xlim([0, t1[-1]])
-plt.ylim([np.min(signal3), np.max(signal3)])
-
-plt.subplot(4, 2, 6)
-plt.plot(frequencies3, np.abs(spectrum3))
-plt.xlim([0, frequencies3[-1]])
-plt.ylim([0, np.max(frequencies_all)])
-plt.title("Spectrum of Note 3")
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Amplitude')
-
-plt.subplot(4, 2, 7)
-plt.plot(t1, signals)
-plt.title("Chord")
-plt.ylabel("Signal Amplitude")
-plt.xlabel("Time (s)")
-plt.xlim([0, t1[-1]])
-plt.ylim([np.min(signals), np.max(signals)])
-
-plt.subplot(4, 2, 8)
-plt.plot(frequencies_all, np.abs(spectrum_all))
-plt.xlim([0, frequencies_all[-1]])
-plt.ylim([0, np.max(frequencies_all)])
-plt.title("Spectrum of Chord")
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Amplitude')
 plt.tight_layout()
-
-# After all this figure "creating", show the figure (this will pop up on your screen once this is run)
 plt.show()
